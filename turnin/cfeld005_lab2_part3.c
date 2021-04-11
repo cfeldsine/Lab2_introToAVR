@@ -15,28 +15,29 @@
 int main(void) {
     /* Insert DDR and PORT initializations */
     DDRA = 0x00; PORTA = 0xFF;
-    DDRB = 0x00; PORTB = 0xFF;
-    DDRC = 0x00; PORTC = 0xFF;
-    DDRD = 0xFF; PORTD = 0x00;
-    unsigned short weight;
-    unsigned char tmpD;
+    DDRC = 0xFF; PORTC = 0x00;
+    unsigned char tmpA = 0x00;
+    unsigned char mask = 0x00;
+    unsigned char count = 0x00, i = 0x00;
     while (1) {
-	tmpD = 0x00;
-	weight = PINA + PINB + PINC;
-	while (weight > 0x3F){
-	    weight = weight/2;
+	tmpA = PINA & 0x0F;
+	mask = 0x01;
+	count = 0x00;
+	i = 0x00;
+	while (i<4){
+	    if (!(tmpA & mask)){
+		count++;
+	    }
+	    i++;
+	    mask *= 2;
 	}
-	tmpD = weight;
-	tmpD *= 4;
-
-	weight = PINA + PINB + PINC;
-        if (weight > 140){
-            tmpD = tmpD | 0x01;
-        }
-        if (PINA - PINC > 80 || PINC - PINA > 80){
-           tmpD = tmpD | 0x02;
-        }
-	PORTD = tmpD;
+	if (count >= 0x0F){
+	    count = 0x0F;
+	}
+	if (count == 0){
+	    count = 0x80;
+	}
+        PORTC = count;
     }
     return 1;
 }
